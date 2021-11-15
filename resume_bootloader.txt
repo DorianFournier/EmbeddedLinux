@@ -1,0 +1,145 @@
+Objectif : créer un script permettant de faire un chenillard avec les LEDs.
+
+Suivre les étapes suivantes (l'exemple suivi est celui réalisé en cours) : 
+
+Préambule : 
+
+1 - Ouvrir 2 shell : un pour l’hôte et un pour la cible. 
+    HOTE  :  rien de particulier à faire
+    CIBLE :  Laptop-Linux  sudo microcom --port=/dev/ttyUSB0 --speed=115200  
+
+Début de démarche :
+
+1 - Créer un fichier intitulé boot.cmd dans la racine du repo u-boot. 
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> touch boot.cmd
+
+2 - Remplir le fichier avec un script en langage "u-boot". 
+    Voici l'exemple réalisé en cours : 
+'''
+                                        while true
+                                        do
+                                        for i in 0 1 2 3 4 5 6 7
+                                        do
+                                        gpio toggle gpio@20_$i
+                                        sleep 1
+                                        done 
+                                        done
+'''
+
+3 - Compiler ce fichier .cmd en binaire à l'aide de la commande suivante : 
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> ./tools/mkimage -C none -A arm -T script -d boot.cmd boot.src
+    Cette commande crée donc un binaire intitulé "boot.src"
+
+4 - Copier le fichier binaire généré précédemment à un endroit précis à l'aide de la commande suivante :
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> cp boot.src /tftpboot
+
+5 - Synchronisé les états à l'aide de la commande suivante :
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> sync
+
+6 - Lancé l’exécution du bootloader sur la cible : 
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> sudo ~/Bureau/Ynov/b3/imx_usb_loader/imx_usb u-boot-dtb.imx
+
+7 - Arrêter le boot automatique sur l'autre terminal avant les 10 secondes configurées précédemment en appuyant sur une touche(Voir plus bas)
+
+8 - Voici une erreur qui peut arriver si l’environnement n'a pas été correctement configuré : 
+'''
+                ynov ~  source $locateaddr
+                ## Executing script at 80800000
+                Wrong image format for "source" command
+                ynov ~  tftp $locateaddr boot.src
+                using ci_udc, OUT ep2out-bulk IN ep1in-bulk STATUS ep3in-int
+                MAC de:ad:be:af:00:01
+                HOST MAC de:ad:be:af:00:00
+                high speed config #1: 2 mA, Ethernet Gadget, using CDC Ethernet
+                USB network up!
+                *** ERROR: `serverip' not set
+'''
+    Il faut donc configurer l'ip du serveur (le PC HOTE) et l'ip de la cible (WARP7). Pour cela, il faut faire les commandes suivantes : 
+                        
+                ynov ~  editenv ipaddr
+                edit: 192.168.20.1
+                ynov ~  editenv serverip
+                edit: 192.168.20.2
+
+    LA CIBLE à donc pour IP : 192.168.20.1
+    L'HOTE à donc pour IP   : 192.168.20.2
+
+9 - 
+    ynov ~  tftp $locateaddr boot.src
+
+    IL FAUT À CE MOMENT ALLER SUR LE TERMINAL HÔTE ET TAPER LA COMMANDE SUIVANTE AFIN DE PERMETTRE A LA CHIP DE SE CONNECTER AU SERVEUR :
+
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> sudo ifconfig enxdeadbeaf0000 192.168.20.2
+
+    Voici un exemple de résultat que vous devriez avoir : 
+'''
+                using ci_udc, OUT ep2out-bulk IN ep1in-bulk STATUS ep3in-int
+                MAC de:ad:be:af:00:01
+                HOST MAC de:ad:be:af:00:00
+                high speed config #1: 2 mA, Ethernet Gadget, using CDC Ethernet
+                USB network up!
+                Using usb_ether device
+                TFTP from server 192.168.20.2; our IP address is 192.168.20.1
+                Filename 'boot.src'.
+                Load address: 0x80800000
+                Loading: #
+	                 0 Bytes/s
+                done
+                Bytes transferred = 156 (9c hex)
+'''
+
+10 - On peut maintenant lancer l’exécution du script binaire téléverser sur la carte à l'aide de la commande suivante : 
+     ynov ~  source $locateaddr
+
+    Voici un exemple de résultat que vous devriez avoir :
+'''
+                gpio: pin gpio@20_0 (gpio 224) value is 0
+                gpio: pin gpio@20_1 (gpio 225) value is 0
+                gpio: pin gpio@20_2 (gpio 226) value is 0
+                gpio: pin gpio@20_3 (gpio 227) value is 0
+                gpio: pin gpio@20_4 (gpio 228) value is 0
+                gpio: pin gpio@20_5 (gpio 229) value is 0
+                gpio: pin gpio@20_6 (gpio 230) value is 0
+                gpio: pin gpio@20_7 (gpio 231) value is 0
+                gpio: pin gpio@20_0 (gpio 224) value is 1
+                gpio: pin gpio@20_1 (gpio 225) value is 1
+                ...
+'''
+    
+==========================================
+
+COMMANDES À EXPLIQUER : 
+
+- make warp7_defconfig
+- make menuconfig
+- export CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf-
+- ynov ~  gpio set gpio@20_0 1                  : turn off LED
+  gpio: pin gpio@20_0 (gpio 224) value is 1
+- saveenv : permet de sauvegarder les modifications apportées dans l'environnement
+- ifconfig : permet d'avoir des informations sur l'adresse IP
+
+==========================================
+
+CONFIGURER LE BOOT AUTOMATIQUE A X SECONDES :
+
+1 - Dans un terminal, au niveau de la racine du repo u-boot taper la commande suivante permettant l'acces au menu de configuration du bootloader
+    
+    Laptop-Linux  ~/Bureau/Ynov/b3/u-boot   ynov-tp ±  ~> make menuconfig
+
+2 - Une fois dans la fenetre du menuconfig, appuyer sur 'SHIFT + /' afin d'effectuer une recherche rapide. Entrer "prompt" à l'intérieur de la barre de rechercher et appuyer sur entrer.
+
+3 - Choisir AUTOBOOT_PROMPT (1) en tapant 1 ou en réalisant le chemin donné à la main.
+    Entrer un nombre dans la ligne "delay in seconds before automatically booting"
+
+4 - Une fois cela fait, sauvegarder et quitter le menuconfig.
+
+5 - Compiler le bootloader à l'aide de la commande : make 
+
+À TERMINER 
+
+==========================================
+
+COMMENT QUITTER LE TERMINAL DE LA CIBLE : CTRL + ALT GR + \
+                                        => quit
+
+
