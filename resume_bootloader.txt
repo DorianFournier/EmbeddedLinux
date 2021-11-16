@@ -143,3 +143,59 @@ COMMENT QUITTER LE TERMINAL DE LA CIBLE : CTRL + ALT GR + \
                                         => quit
 
 
+==========================================
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+crée un code "sh"
+
+louis~ env set foo 'echo hello' // on crée le fichier 
+louis~ run foo             // on le lance 
+hello
+louis~ editenv foo             // pour éditer le fichier "foo"        
+edit: echo hello; echo ynov    // comme la commande print 
+//resultat:
+hello
+ynov
+
+// Tftp (liaison Ethernet par USB entre le PC maître et la machine esclave)
+
+
+///////////////////machine esclave (machine warp7)
+
+louis~ editenv ipaddr // commande pour éditer l’adresse IP
+edit: 192.168.1.12    // on met une IP random
+
+
+louis~ editenv serverip    // commande pour éditer l’adresse IP
+edit: 192.168.1.13         // on met une IP différente de la première  
+louis~ tftp $loadaddr test       
+
+///////////////////Machine maitre (ton PC sur Linux)
+
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo mkdir /tftpboot 
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo chmod -R 777 /tftpboot
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo chown -R nobody /t
+tftpboot/ tmp/      
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo chown -R nobody /tftpboot
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo systemctl restart xinetd.service 
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ touch /tftpboot/test
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo ifconfig enxdeadbeaf0000 192.168.1.13 
+louis@louis-ROG:~/Bureau/Linux_Embarqué/u-boot$ sudo ifconfig enxdeadbeaf0000 192.168.1.13 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+passez un fichier du serveur à la cible une fois la liaison Tftp initialisée
+
+ sur le serveur :                                              |etapes|
+./tools/mkimage -C none -A arm -T script -d boot.cmd boot.scr  |   1  |
+  316  cat boot.scr                                            |      |
+  317  cp boot.scr /tftpboot/                                  |   2  |
+  318  sudo ifconfig enxdeadbeaf0000 192.168.1.13              |   4  |
+  319  cp boot.scr /tftpboot/                                  |      |
+  320  sudo ifconfig enxdeadbeaf0000 192.168.1.13              |      |
+                                                               |      |
+                                                               |      |
+  sur la cible :                                               |      |
+                                                               |      |
+  louis~ tftp $loadaddr boot.scr                               |   3  |
+  source $loadaddr
