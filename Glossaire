@@ -1,0 +1,76 @@
+Export librairie ?
+===================
+export CROSS_COMPILE=/home/mathieuvallade/Documents/Linux/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf-
+
+
+Acceder à la carte
+===================
+microcom -p /dev/ttyUSB0 --speed=115200
+
+
+Flasher la carte
+=================
+sudo ~/imx_usb_loader/imx_usb u-boot-dtb.imx
+
+
+Reset environemment
+====================
+env default -f -a
+
+
+Save environement
+==================
+saveenv
+
+
+Modifier boot delay
+====================
+editenv bootdelay
+
+
+Modifier variable
+==================
+editenv
+
+
+Afficher les variables d'environnement
+======================================
+printenv 
+
+
+Lancer variable
+================
+run 
+
+
+Créer varibale (clef = valeur)
+==============================
+env set " " " "
+
+
+Créer varibale (pour run)
+==========================
+env set echo " " 
+
+
+Binariser
+=========
+./tools/mkimage -C none -A arm -T script -d boot.cmd boot.scr
+
+
+Copier Coller boot.src dans tftpboot
+====================================
+cp boot.src /tftpboot
+
+
+Chargement du fichier boot.src à l'adresse locateaddr
+=====================================================
+tftp $locateaddr boot.src
+
+Run le script chargé à l'adresse addr
+=====================================
+source $loadaddr
+
+=====================================
+source $loadaddr
+
