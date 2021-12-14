@@ -1,0 +1,258 @@
+==================== KERNEL - 30/11/2021 =======================
+
+////////////////// cours matin ////////////////////
+
+Objectif du cours sur le kernel (partie pratique) : réalisation de driver pour la gestion de capteurs (pression ...) -> aller taper dans un registre niveau noyau.
+
+"Définition" : abstraction matériel => lien entre le soft et le hard. C'est un morceau de logiciel qui aide à l'interface du matériel.
+
+Rôles principaux du kernel : 
+
+    - Fournir au logiciel une interface pour utiliser le matériel,
+    - Contribut à la gestion des ressources materielles (CPU, memoires, Input/Output),
+    - Ordonnancement : bon fonctionnement de la plateforme, il donne des priorités aux différents processus qui tournent sur le noyau.
+
+Pour voir les processus qui tournent sur le PC taper la commande suivante    : ps -faux
+Pour voir les processus qui tournent sur la cible taper la commande suivante : ps -ef
+
+PID = identifiant de processsus (identifiant unique d'identification) -> permet d'indentifier les soft qui tournent 
+Le PID1 sera toujours identique : c'est le processus d'init.
+
+Explications des commandes globales utilisées : 
+
+    1- make ARCH=arm CROSS_COMPILE=/home/user_name/Documents/coursprog/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- zImage dtbs -j8 : permet de générer la zImage (image 'compressée' du kernel linux).
+
+    2- make ARCH=arm CROSS_COMPILE=/home/user_name/Documents/coursprog/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- imx7s-warp.dtb -j8 : pemret de compiler l'imx7s en fichier binaire pour la cible (passage d'un .dts à un .dtb)
+
+Si des problemes sont rencontrés, mieux vaut refaire l'intégralité du processus : (remplacer : arm-linux-gnueabihf- par votre chaine de compilation)
+
+    1- make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- mrproper        //permet de clean le résultat de compilation
+    2- make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- imx_v6_v7_defconfig
+    3- make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage -j$(nproc)
+    4- make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- imx7s-warp.dtb -j$(nproc)
+
+=================
+
+Communication inter-processus : permet de communiquer entre différents processus du système
+
+Architecture système : lors de la création d'une architecture système, l'exploser le plus que possible en de multiple fichier binaire dédier à un processus particulié afin d'éviter de crash le système si un seul des processus est down. 
+
+=================
+
+Discussion sur le site : kernel.org
+
+Deux types de "versions" : 
+
+    - stable
+    - longterm => auront uniquement les fix de sécurités comme MàJ
+
+=================
+
+Réduire l'empreinte mémoire de l'image kernel => améliore la boot sequence (gain de rapidité)
+
+/home/dorian/linux/linux/arch/arm/configs => imx_v6_v7_defconfig 
+
+((Device tree = lien entre le kernel et les périphériques)) 
+
+=======================================================================================================
+
+//////////////////// cours aprem ////////////////////////
+
+TP : Manipuler les images (device tree et images kernel)
+
+1 - /home/dorian/linux/linux/arch/arm/configs => imx_v6_v7_defconfig
+ 
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make ARCH=arm imx_v6_v7_defconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTCC  scripts/kconfig/confdata.o
+  HOSTCC  scripts/kconfig/expr.o
+  LEX     scripts/kconfig/lexer.lex.c
+  YACC    scripts/kconfig/parser.tab.[ch]
+  HOSTCC  scripts/kconfig/lexer.lex.o
+  HOSTCC  scripts/kconfig/menu.o
+  HOSTCC  scripts/kconfig/parser.tab.o
+  HOSTCC  scripts/kconfig/preprocess.o
+  HOSTCC  scripts/kconfig/symbol.o
+  HOSTCC  scripts/kconfig/util.o
+  HOSTLD  scripts/kconfig/conf
+#
+# configuration written to .config
+#
+
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make ARCH=arm menuconfig
+
+ .config - Linux/arm 5.16.0-rc1 Kernel Configuration => prouve qu'on est sur le kernel linux
+
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  cd arch/arm/configs 
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux/arch/arm/configs   topic/kernel-ynov  ls
+am200epdkit_defconfig     gemini_defconfig         multi_v5_defconfig    s5pv210_defconfig
+aspeed_g4_defconfig       h3600_defconfig          multi_v7_defconfig    sama5_defconfig
+aspeed_g5_defconfig       h5000_defconfig          mv78xx0_defconfig     sama7_defconfig
+assabet_defconfig         hackkit_defconfig        mvebu_v5_defconfig    shannon_defconfig
+at91_dt_defconfig         hisi_defconfig           mvebu_v7_defconfig    shmobile_defconfig
+axm55xx_defconfig         imote2_defconfig         mxs_defconfig         simpad_defconfig
+badge4_defconfig          imx_v4_v5_defconfig      neponset_defconfig    socfpga_defconfig
+bcm2835_defconfig         imx_v6_v7_defconfig      netwinder_defconfig   spear13xx_defconfig
+cerfcube_defconfig        integrator_defconfig     nhk8815_defconfig     spear3xx_defconfig
+clps711x_defconfig        iop32x_defconfig         omap1_defconfig       spear6xx_defconfig
+cm_x300_defconfig         ixp4xx_defconfig         omap2plus_defconfig   spitz_defconfig
+cns3420vb_defconfig       jornada720_defconfig     orion5x_defconfig     stm32_defconfig
+colibri_pxa270_defconfig  keystone_defconfig       oxnas_v6_defconfig    sunxi_defconfig
+colibri_pxa300_defconfig  lart_defconfig           palmz72_defconfig     tct_hammer_defconfig
+collie_defconfig          lpc18xx_defconfig        pcm027_defconfig      tegra_defconfig
+corgi_defconfig           lpc32xx_defconfig        pleb_defconfig        trizeps4_defconfig
+davinci_all_defconfig     lpd270_defconfig         pxa168_defconfig      u8500_defconfig
+dove_defconfig            lubbock_defconfig        pxa255-idp_defconfig  versatile_defconfig
+dram_0x00000000.config    magician_defconfig       pxa3xx_defconfig      vexpress_defconfig
+dram_0xc0000000.config    mainstone_defconfig      pxa910_defconfig      vf610m4_defconfig
+dram_0xd0000000.config    milbeaut_m10v_defconfig  pxa_defconfig         viper_defconfig
+ep93xx_defconfig          mini2440_defconfig       qcom_defconfig        vt8500_v6_v7_defconfig
+eseries_pxa_defconfig     mmp2_defconfig           realview_defconfig    xcep_defconfig
+exynos_defconfig          moxart_defconfig         rpc_defconfig         zeus_defconfig
+ezx_defconfig             mps2_defconfig           s3c2410_defconfig
+footbridge_defconfig      multi_v4t_defconfig      s3c6400_defconfig
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux/arch/arm/configs   topic/kernel-ynov  cp imx_v6_v7_defconfig ynov_warp_defconfig
+
+
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make ARCH=arm ynov_warp_defconfig
+#
+# No change to .config
+#
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make ARCH=arm menuconfig         
+
+
+*** End of the configuration.
+*** Execute 'make' to start the build or try 'make help'.
+
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make savedefconfig  
+	
+=======================
+
+Commande pour générer le device tree : 
+
+dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- imx7s-warp.dtb
+
+Vérifier le fichier : 
+
+dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  l arch/arm/boot/dts/imx7s-warp.dtb
+-rw-rw-r-- 1 dorian dorian 30K nov.  30 14:12 arch/arm/boot/dts/imx7s-warp.dtb
+
+/* === Flasher definitivement le bootloader sur la carte === */
+
+Préambule : à partir de maintenant les termes : "Terminal Linux" -> terminal chip
+                                                "Terminal Warp"  -> terminal warp
+Les chemins présents dans les lignes de commandes peuvent également être différent les uns des autres en fonction de l'endroit ou vous avez mis votre chaine de compilation croisée et autre ...
+
+Ouvrir dans le terminal Linux :
+    1- sudo apt install dfu-util
+    2- cd u-boot
+    3- sudo /home/user_name/imx_usb_loader/imx_usb u-boot-dtb.imx
+
+Ouvrir dans le terminal Warp:
+    1- sudo microcom -p /dev/ttyUSB0
+    --> appuyer sur le switch pour flasher la carte
+    2- dfu 0 mmc 0
+
+Faire dans le terminal Warp :
+--> attention ce mettre dans le fichier de compilation (ici u-boot) 
+    exemple : ~/Bureau/Ynov/b3/u-boot   ynov-tp ± 
+    
+    1- sudo dfu-util -D u-boot-dtb.imx -a boot
+
+--> bouger le switch une fois flash-->  switch 2
+
+Message de réussite :
+
+    dfu-util 0.9
+[...]
+    Device returned transfer size 4096
+    Copying data from PC to DFU device
+    Download	[=========================] 100%       461824 bytes
+    Download done.
+    state(7) = dfuMANIFEST, status(0) = No error condition is present
+    state(2) = dfuIDLE, status(0) = No error condition is present
+    Done!
+
+===============
+
+Voir si la compilation s'est bien passé :
+
+root@imx7s-warp:~# uname -a
+Linux imx7s-warp 5.16.0-rc1-00021-g42eb8fdac2fc #1 SMP Tue Nov 30 15:36:49 CET 2021 armv7l GNU/Linux
+
+================
+
+/* === Process d'activation gpio === */
+
+ 1- Modifier le fichier imx7s-warp.dts avec un editeur de texte (ex: VSCode):
+
+        code linux/arch/arm/dts/imx7s-warp //exemple de ligne de commande pour ouvrir le fichier imx7s-warp dans VSC
+
+    //Faire un CTRL+F : 'i2c3' et modifier le noeud i2c3 pour au final avoir cela :
+
+"""
+    &i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c3>;
+	status = "okay";
+	mcp23008: mcp23008@20 {
+		compatible = "microchip,mcp23008";
+		gpio-conroller;
+		#gpio-cells = <2>;
+		reg = <0x20>;
+	    };
+    };
+
+"""
+
+Ouvrir le terminal Linux:
+
+    1- make menuconfig ARCH=arm CROSS_COMPILE=/home/julien/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- : cette commande permet de passer dans le menuconfig
+(( commande identique avec le "menuconfig" à la fin de la ligne : make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- menuconfig ))
+
+Une fois dans le menu config, faire un MAJ+/ pour ouvrir une barre de recherche, et taper "MCP23" puis entrer.
+
+Appuyer sur 1 et sur la touche espace jusqu’a avoir « M » entre les crochets
+--> ne pas oublier de save avant de quitter 
+
+//On recompile les modules
+    2- make ARCH=arm CROSS_COMPILE=/home/jordan/Documents/coursprog/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- modules -j8      (ou : 'j$(nproc)' à la place de '-j8' )
+
+//On recompile le imx7s-warp.dtb
+    3- make ARCH=arm CROSS_COMPILE=/home/jordan/Documents/coursprog/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- imx7s-warp.dtb -j8
+
+On ouvre un terminale Warp pour copier les modules sur la carte dans le microcom:
+    4- sudo microcom -p /dev/ttyUSB0
+    5- appuyer sur le bouton pour flasher la carte
+    6- ums 0 mmc 0
+
+Côté PC (Terminal Linux) on installe les modules : 
+
+    7- sudo make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- INSTALL_MOD_PATH=/media/dorian/root modules_install -j$(nproc)
+
+Et on copie le fichier qu'on a modifié et la zImage (toujours côté terminal Linux): 
+    8- sudo cp arch/arm/boot/dts/imx7s-warp.dtb /media/user_name/boot         
+    9- sudo cp arch/arm/boot/zImage /media/user_name/boot
+    10- sudo sync
+
+Enfin pour vérifier si tout c'est bien passé, faire côté terminal warp :
+    11- CTRL+C pour sorir du mode bootloader
+    12- run bootcmd
+    13- gpioinfo        --> on doit avoir 7 chips GPIO
+
+=================
+
+Commandes de debug et divers :
+    1- printenv --> afficher les variables de l'environement
+    2- nproc    --> permet d'avoir le nombre de coeur du système
+    3- uname -a --> permet d'avoir le nom et la version 
+
+    4- make ARCH=arm CROSS_COMPILE=/home/jordan/Documents/coursprog/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- modules -j8 (à faire après run bootcmd)
+
+    5- echo j$(nproc) --> affiche le nombre de coeur disponible
+
+    6- cat defconfig | grep ynov
+    7- cat defconfig | grep ynov | wc -l
+    8- ls /sys/class/leds --> affiche les leds presente dans le PC

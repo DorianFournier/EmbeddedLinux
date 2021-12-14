@@ -1,0 +1,30 @@
+Tags des versions : 
+
+    - rc => release candidate
+    ex : "OS : prepare 3.01.2 rc-2"
+
+Que fait la commande suivante : make ARCH=arm imx_v6_v7_defconfig
+
+    Va cherher la config pour imx 6 et 7 et va creer le .config à la racine du linux 
+    prendre la configuration quon souhiate pour l'utiliser 
+    "make" n'est pas la pour compiler c'est juste une interface principale
+
+- iio : industrial 
+
+Dans menuconfig : 
+
+- M (Module) = genere un fichier appart, il ne sera pas disponible des le demarage de la plateforme
+
+====================
+
+ que fait la commande : make ARCH=arm imx_v6_v7_defconfig
+ 
+ la commande suivante va cherhcer la config à imx et creer la config à la racine pour pouvoir l'utiliser 
+ 
+ 
+ cat defconfig| grep ynov
+--> la fonction |grep permet de mettre un filtre dans la recherche 
+
+
+cat defconfig| grep ynov |wc -l
+--> permet d'avoir le nombre de ligne

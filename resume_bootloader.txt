@@ -43,10 +43,10 @@ Début de démarche :
 
 8 - Voici une erreur qui peut arriver si l’environnement n'a pas été correctement configuré : 
 '''
-                ynov ~  source $locateaddr
+                ynov ~  source $loadaddr
                 ## Executing script at 80800000
                 Wrong image format for "source" command
-                ynov ~  tftp $locateaddr boot.src
+                ynov ~  tftp $loadaddr boot.src
                 using ci_udc, OUT ep2out-bulk IN ep1in-bulk STATUS ep3in-int
                 MAC de:ad:be:af:00:01
                 HOST MAC de:ad:be:af:00:00
@@ -65,7 +65,7 @@ Début de démarche :
     L'HOTE à donc pour IP   : 192.168.20.2
 
 9 - 
-    ynov ~  tftp $locateaddr boot.src
+    ynov ~  tftp $loadaddr boot.src
 
     IL FAUT À CE MOMENT ALLER SUR LE TERMINAL HÔTE ET TAPER LA COMMANDE SUIVANTE AFIN DE PERMETTRE A LA CHIP DE SE CONNECTER AU SERVEUR :
 
@@ -89,7 +89,7 @@ Début de démarche :
 '''
 
 10 - On peut maintenant lancer l’exécution du script binaire téléverser sur la carte à l'aide de la commande suivante : 
-     ynov ~  source $locateaddr
+     ynov ~  source $loadaddr
 
     Voici un exemple de résultat que vous devriez avoir :
 '''
@@ -199,3 +199,33 @@ passez un fichier du serveur à la cible une fois la liaison Tftp initialisée
                                                                |      |
   louis~ tftp $loadaddr boot.scr                               |   3  |
   source $loadaddr
+
+================================================
+
+RESUMER DU BOOTLOADER : 
+
+dans u-boot : 
+    - gpio status -a : permet de savoir quels sont les GPIO
+    - mkimage        : permet de compiler les scripts en binaire 
+Serveur TFTP : https://doc.ubuntu-fr.org/tftpd
+
+connaitre interface réseau ; ifconfig -a 
+monter l'interface reseau : A TERMINER
+
+=================================================
+Monter les partitions de la cible sur le PC : 
+    taper la commande suivante dans la chip  : ynov ~ ums 0 mmc 0
+
+    i2cdetect -y 3 : permet d'afficher les adresses I2C (Si un 'UU' est présent cela signifie que cette adresse est réservée au noyau)
+
+Savoir ce qu'il y a sur une carte : regarder dans le device tree 
+
+=====================================
+
+Buildroot permet de générer des chaines de compilation croisées
+
+=====================================
+
+clone le kernel linux : 
+
+git clone https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
