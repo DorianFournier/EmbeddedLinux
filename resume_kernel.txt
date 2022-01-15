@@ -1,5 +1,29 @@
 ==================== KERNEL - 30/11/2021 =======================
 
+==================
+BUILDROOT
+==================
+Configurer le buildroot
+  make warp7_defconfig
+  make menuconfig
+Une fois la config terminée
+  make
+
+L'image sera dans  output/images/ 
+
+Pour flaché l'image
+==================
+==================
+Sur le terminal de.la carte 
+Touche "entrer" 
+=> ums 0 mmc 0
+ 
+La carte va apparaître comme une "clef USB"
+
+On prend "sdcard.img"  dans output/images/
+sudo dd if=output/images/sdcard.img of=/dev/<non du mass storage>
+(Pas de crtl+c ni crtl+v ça peut foiré (que en ligne de cmd))
+
 ////////////////// cours matin ////////////////////
 
 Objectif du cours sur le kernel (partie pratique) : réalisation de driver pour la gestion de capteurs (pression ...) -> aller taper dans un registre niveau noyau.
@@ -86,6 +110,7 @@ TP : Manipuler les images (device tree et images kernel)
 
  dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  cd arch/arm/configs 
  dorian@dorian-ASUSLaptop-Linux  ~/linux/linux/arch/arm/configs   topic/kernel-ynov  ls
+
 am200epdkit_defconfig     gemini_defconfig         multi_v5_defconfig    s5pv210_defconfig
 aspeed_g4_defconfig       h3600_defconfig          multi_v7_defconfig    sama5_defconfig
 aspeed_g5_defconfig       h5000_defconfig          mv78xx0_defconfig     sama7_defconfig
@@ -112,8 +137,8 @@ eseries_pxa_defconfig     mmp2_defconfig           realview_defconfig    xcep_de
 exynos_defconfig          moxart_defconfig         rpc_defconfig         zeus_defconfig
 ezx_defconfig             mps2_defconfig           s3c2410_defconfig
 footbridge_defconfig      multi_v4t_defconfig      s3c6400_defconfig
- dorian@dorian-ASUSLaptop-Linux  ~/linux/linux/arch/arm/configs   topic/kernel-ynov  cp imx_v6_v7_defconfig ynov_warp_defconfig
 
+ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux/arch/arm/configs   topic/kernel-ynov  cp imx_v6_v7_defconfig ynov_warp_defconfig
 
  dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  make ARCH=arm ynov_warp_defconfig
 #
@@ -140,7 +165,7 @@ dorian@dorian-ASUSLaptop-Linux  ~/linux/linux   topic/kernel-ynov  l
 
 /* === Flasher definitivement le bootloader sur la carte === */
 
-Préambule : à partir de maintenant les termes : "Terminal Linux" -> terminal chip
+Préambule : à partir de maintenant les termes : "Terminal Linux" -> terminal PC
                                                 "Terminal Warp"  -> terminal warp
 Les chemins présents dans les lignes de commandes peuvent également être différent les uns des autres en fonction de l'endroit ou vous avez mis votre chaine de compilation croisée et autre ...
 
@@ -256,3 +281,227 @@ Commandes de debug et divers :
     6- cat defconfig | grep ynov
     7- cat defconfig | grep ynov | wc -l
     8- ls /sys/class/leds --> affiche les leds presente dans le PC
+
+==================
+
+ajouter le capteur de temperature :
+
+1- rechercher dans la documentation le noeud à rajouter dans le noeud i2c3 du device tree
+    voici le chemin menant à la documentation : 
+
+
+==================
+
+ajouter la RTC ; 
+menu confiug taper : ds13 et prendre ds1307 
+"""
+  │ Symbol: RTC_DRV_DS1307 [=y]                                                                                   │  
+  │ Type  : tristate                                                                                              │  
+  │ Defined at drivers/rtc/Kconfig:247                                                                            │  
+  │   Prompt: Dallas/Maxim DS1307/37/38/39/40/41, ST M41T00, EPSON RX-8025, ISL12057                              │  
+  │   Depends on: RTC_CLASS [=y] && I2C [=y]                                                                      │  
+  │   Location:                                                                                                   │  
+  │     Main menu                                                                                                 │  
+  │       -> Device Drivers                                                                                       │  
+  │ (3)     -> Real Time Clock (RTC_CLASS [=y])                                                                   │  
+  │ Selects: REGMAP_I2C [=y] && WATCHDOG_CORE [=y]      
+"""
+
+
+
+==================
+
+ajouter pcf : 
+
+aller dans menuconfig : et taper pcf8591
+
+"""
+  │ Symbol: SENSORS_PCF8591 [=n]                                                                                  │  
+  │ Type  : tristate                                                                                              │  
+  │ Defined at drivers/hwmon/Kconfig:1518                                                                         │  
+  │   Prompt: Philips PCF8591 ADC/DAC                                                                             │  
+  │   Depends on: HWMON [=y] && I2C [=y]                                                                          │  
+  │   Location:                                                                                                   │  
+  │     Main menu                                                                                                 │  
+  │       -> Device Drivers                                                                                       │  
+  │ (1)     -> Hardware Monitoring support (HWMON [=y]) 
+"""
+
+
+=============
+
+dmesg : permet de voir different log envoyé par le kernel / montrer les infos du driver
+lsmod : permet de voir quelle module sont instancier sur le systeme
+
+================
+
+travail avec le prof :
+
+make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- menuconfig
+
+make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- zImage -j$(nproc)
+
+make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- modules -j$(nproc)
+
+make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- imx7s-warp.dtb -j$(nproc)
+
+autre terminal : 
+
+sudo microcom -p /dev/ttyUSB0
+boot la crate en appuyant sur le bouton et faire un ums 0 mmc 0
+
+retour sur l'autre terminal : 
+
+ls /media/dorian/root/lib/modules/ : permet d'affocher les dossiers de modules 
+sudo rm -rf /media/dorian/root/lib/modules/5.* : permet de supprimer les modules 
+
+sudo rm -rf /media/dorian/root/lib/modules/5.*
+
+sudo cp arch/arm/boot/zImage /media/dorian/boot      
+
+sudo make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- INSTALL_MOD_PATH=/media/dorian/root modules_install -j$(nproc)
+
+sudo sync 
+
+aller dans le terminal chip : 
+CTRL+C 
+run bootcmd
+... le kernel se charge
+rentrer le mot de passe de la cible : root 
+
+lsmod : pour afficher les modules
+
+ verification : 
+taper : 
+
+->gpioinfo
+
+gpiochip7 - 8 lines:
+	line   0:      unnamed       unused   input  active-high 
+	line   1:      unnamed       unused   input  active-high 
+	line   2:      unnamed       unused   input  active-high 
+	line   3:      unnamed       unused   input  active-high 
+	line   4:      unnamed       unused   input  active-high 
+	line   5:      unnamed       unused   input  active-high 
+	line   6:      unnamed       unused   input  active-high 
+	line   7:      unnamed       unused   input  active-high 
+root@imx7s-warp:~# cat /sys/class/hwmon/hwmon0/temp1_input
+27000
+root@imx7s-warp:~# ls /dev/rtc
+rtc   rtc0  rtc1
+
+================
+lister les interruptions :
+
+root@imx7s-warp:~# cat /proc/interrupts 
+           CPU0       
+ 25:      44016     GIC-0  29 Level     arch_timer
+ 26:          0     GIC-0  30 Level     arch_timer
+ 29:          0     GPCv2  55 Level     i.MX Timer Tick
+ 30:          0     GPCv2  92 Level     arm-pmu
+ 45:          0     GPCv2  78 Level     30280000.watchdog
+ 48:          0     GPCv2  19 Level     rtc alarm
+ 52:          0     GPCv2   7 Level     csi
+ 53:          0     GPCv2  25 Level     30750000.mipi-csi
+ 54:       2684     GPCv2  26 Level     30860000.serial
+ 55:          0     GPCv2  28 Level     30880000.serial
+ 56:          0     GPCv2  95 Level     sai
+ 58:         92     GPCv2  35 Level     30a20000.i2c
+ 59:         14     GPCv2  36 Level     30a30000.i2c
+ 60:      29026     GPCv2  37 Level     30a40000.i2c
+ 61:        374     GPCv2  38 Level     30a50000.i2c
+ 62:          0     GPCv2  16 Level     30a80000.serial
+ 63:        417     GPCv2  43 Level     30b10000.usb
+ 64:       1884     GPCv2  22 Level     mmc0
+ 65:       3240     GPCv2  24 Level     mmc2
+ 66:          0     GPCv2   2 Level     sdma
+261:          0  gpio-mxc   1 Edge      Back
+292:         26     GPCv2 105 Level     30901000.jr
+293:          1     GPCv2 106 Level     30902000.jr
+294:          0     GPCv2 114 Level     30903000.jr
+IPI0:          0  CPU wakeup interrupts
+IPI1:          0  Timer broadcast interrupts
+IPI2:          0  Rescheduling interrupts
+IPI3:          0  Function call interrupts
+IPI4:          0  CPU stop interrupts
+IPI5:          0  IRQ work interrupts
+IPI6:          0  completion interrupts
+Err:          0
+
+================
+
+petite histoire : 
+
+boot loader : comment le compiler, le configurer, le deployer sur la cible.
+    en + : comment ajouter dans le device tree qui se trouve dans les sources du bootloader ajouter un noeud. 
+
+Commande : utilisation des boucles, interaction avec les GPIO 
+Ce que l'on a pas vu : comment chargé le kernel et le device tree a la main (exemple page 15 du cours sur le kernel)
+            load mmc 0:1 0x80800000
+
+2 partitions sur la carte :  /boot : partition 1 
+                            /root : partition 2
+
+================
+
+Clignotement LED au démarrage de la cible: 
+
+    1 - ajouter dabs le device tree, au niveau du noeud principal (/ {) : 
+
+    """
+    leds {
+		    compatible = "gpio-leds";
+		    led0 {
+			    gpios = <&mcp23008 0 GPIO_ACTIVE_LOW>;
+			    linux,default-trigger = "heartbeat";
+			    //default-state = "keep";
+		    };
+	    };
+    """
+
+    2 - recompiler le device tree :
+    make ARCH=arm CROSS_COMPILE=/home/jordan/Documents/coursprog/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- imx7s-warp.dtb -j8
+
+    3 - 
+
+
+========== Rajout Entrainement ==================
+
+Rajouter dans le noeud principale du device tree : 
+
+        led1 {
+			        gpios = <&mcp23008 1 GPIO_ACTIVE_HIGH>;
+			        linux,default-trigger = "heartbeat";
+			        //default-state = "keep";
+		        };
+		        led4 {
+			        gpios = <&mcp23008 4 GPIO_ACTIVE_HIGH>;
+			        linux,default-trigger = "heartbeat";
+			        //default-state = "keep";
+		        };
+
+ensuite on recompile le device tree à l'aide de la commande suivante : 
+
+    make ARCH=arm CROSS_COMPILE=/home/dorian/Téléchargements/armv7-eabihf--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabihf- imx7s-warp.dtb -j$(nproc)
+
+enuiste on va sur le terminal de la warp :
+
+    on la flash et interrompre le process pour aller dans le bootloader 
+    taper dans le terminal warp : ums 0 mmc 0
+
+
+retourner sur l'autre terminal (klinux) et copier le device tree à l'aide de la commande suivante : 
+    sudo cp arch/arm/boot/dts/imx7s-warp.dtb /media/dorian/boot
+
+synchroniser (terminal linux): 
+    sudo sync
+
+on retourne sur le terminal warp : 
+    CTRL + C (permet de sortir du ums 0 mmc 0)
+    taper la commande suivante : run bootcmd 
+
+le process de démarrage commence  
+
+Il y a normalement 3 Leds d'allumer 
+
+    

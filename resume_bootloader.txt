@@ -149,10 +149,10 @@ COMMENT QUITTER LE TERMINAL DE LA CIBLE : CTRL + ALT GR + \
 crée un code "sh"
 
 louis~ env set foo 'echo hello' // on crée le fichier 
-louis~ run foo             // on le lance 
+louis~ run foo                  // on le lance 
 hello
-louis~ editenv foo             // pour éditer le fichier "foo"        
-edit: echo hello; echo ynov    // comme la commande print 
+louis~ editenv foo              // pour éditer le fichier "foo"        
+edit: echo hello; echo ynov     // comme la commande print 
 //resultat:
 hello
 ynov
