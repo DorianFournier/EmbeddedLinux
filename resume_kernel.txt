@@ -1,5 +1,6 @@
 ==================== KERNEL - 30/11/2021 =======================
 
+
 ==================
 BUILDROOT
 ==================
@@ -503,5 +504,11 @@ on retourne sur le terminal warp :
 le process de démarrage commence  
 
 Il y a normalement 3 Leds d'allumer 
+==================fichier du device tree
+
+pwd : /home/dorian/linux/linux/arch/arm/boot/dts
+
+device tree : code linux/arch/arm/dts/imx7s-warp
+
 
     

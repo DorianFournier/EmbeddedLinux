@@ -1,0 +1,35 @@
+Liens git hub : https://github.com/buildroot/buildroot
+
+liens ou j'ai clone le repo : /home/dorian/linux/buildroot
+
+petit appercu dans les differentes dossier de buildroot :
+
+    configs : l'ensemble des conifg de certaines bpard presente sur le marche 
+    package : ensemble des logiciels qui sont intregrés au projet 
+
+Ce qu'il y a dans le menu config : 
+target package : ensemnle des outils present dans le projetf
+
+A faire à la maison : 
+
+make distclean
+make warp7_defconfig 
+make menuconfig // ajouter dans menuconfig wchar et python3 
+make
+
+reboot la warp et monter en mass strorage la warp (ums 0 mmc 0)
+dans le terminal linux, faire un dmesg pour savoir quelle partition demonter
+
+resultat du dmesg : 
+    [ 3175.820632]  sda: sda1 sda2
+    [ 3175.848816] sd 1:0:0:0: [sda] Attached SCSI removable disk
+    [ 3176.078797] EXT4-fs (sda2): recovery complete
+    [ 3176.080040] EXT4-fs (sda2): mounted filesystem with ordered data mode. Opts: (null). Quota mode: none.
+    [ 3176.093032] FAT-fs (sda1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+
+effectuer la commande suivante : sudo umount /dev/sda* 
+aller dans output/images : cd output/images
+effectuer cette commande : ATTENTION TRES DANGEREUX : sudo dd if=sdcard.img of=/dev/sda bs=1M
+
+Une fois cela fais, on retourne sur le terminal warp et on fait CTRL+C, reset
+on monte le kernel, et on regarde si python est bien installer
