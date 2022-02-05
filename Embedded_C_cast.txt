@@ -1,0 +1,146 @@
+
+
+
+
+4.2.3. Cast?
+
+Une opération de cast est aussi appelée
+
+	coercition
+
+	transtypage
+
+Conversion d'une valeur d'un type en valeur d'un autre type
+
+
+4.2.3.2 Cast explicite
+
+Le programmeur informe le compilateur de la volonté de faire un cast
+
+Préfixer la valeur par le nouveau type entre parenthèses
+
+Cast explicite
+
+	uint8_t a = 3;
+
+	uint32_t b;
+
+	float c;
+
+	b = (uint32 t) a:
+
+	c = (float) b;
+
+
+
+4.2.3.3 - Cast implicite
+
+Le compilateur est forcé de faire un cast, bien que le programmeur n'ait rien dit
+
+Cast implicite
+
+	uint8 t a = 3; /* avez-vous note le cast implicite ic: 2 */
+
+	uint32_t b;
+
+	float c;
+
+	b = a; /* a est converts en uint32_t avant de le mettre dans b */
+
+	c = b; /* b est converti en float avant de le mettre dans c */
+
+
+4.2.3.4 - Préférez les casts explicites
+
+Si vous n'utilisez pas les casts explicites
+
+	le compilateur fera les casts implicites nécessaires
+
+	le relecteur ne saura pas si le cast implicite est lié à un oubli ou une volonté du programmeur
+
+	en cas d'oubli, cela peut créer des bugs
+
+
+4.2.3.5 Conversion vers un entier de taille plus grande
+
+L'entier garde sa valeur lors du cast
+
+Pour un entier signé extension du bit de signe
+
+	Réplication du bit MSB d'origine sur tous les bits ajoutés
+
+	L'entier garde alors sa valeur
+
+
+
+4.2.3.6 Conversion vers un entier de taille plus petite
+
+La valeur peut être modifiée 
+Seuls les bits de poids faible sont conservés
+Cela revient à faire un modulo
+
+
+4.2.3.7-ATTENTION
+
+Lors d'un cast vers un entier de taille plus petite, la valeur peut être modifiée
+
+Source potentielle de bug
+
+	Le nombre ne vaut pas forcément ce que l'on croit 
+	quand nous avions mis 300 dans un uint8_t crash du premier vol d'Ariane 5! (370 millions de dollars pour un cast)
+
+
+4.2.3.8 - Conversion vers un nombre à virgule flottante
+
+Le nombre flottant le plus proche de la valeur initiale est choisi
+
+La façon d'arrondir est configurable
+
+Conformément à la norme IEEE 754
+
+	Arrondi vers 0
+
+	Arrondi vers +∞
+
+
+4.2.3.9 - Conversion d'un nombre à virgule flottante vers un entier
+
+Une troncature est réalisée
+
+Les chiffres après la virgule sont ignorés
+
+L'entier résultant est casté vers le type entier souhaité
+
+
+
+4.2.3.10 -ATTENTION
+
+Dans un cast de nombre flottant vers un entier, nous perdons de la précision
+
+Source potentielle de bug
+
+Cast float vers entier
+
+	uint8_t a, b, c, deux;
+
+	float f;
+	f = 4.8f;
+	deux - 2;
+
+	a = (uint8_t) (f * deux); /* a = 9 */
+	b = (uint8_t) (E) * deux; /* b = 8 7 */
+	c = (uint8_t) f * deux; /* c= 8 */
+
+4.2.3.11 - Arrondi d'un nombre à virgule
+
+Avec la troncature, 1.9 devient 1 quand il est mis dans un entier
+
+Pour faire un arrondi, il faut ajouter 0,5 avant la troncature
+
+Arrondi
+
+	float f = 5.7f;
+	uint8_t c = (uint8_t) (£ + 0.5f);
+
+4.2.3.12.2-TP: Cast
+4.2.3.12.3-TP: Cast

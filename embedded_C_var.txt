@@ -1,0 +1,148 @@
+4.2.2.13 - short
+
+il a donc au moins 2 pow(16)=65 536 valeurs possibles 
+Son nom signifie petit entier(short integer)
+
+Un unsigned short peut stocker 
+	un nombre de 0 a 65 535
+	un nombre de 0 a 2 pow(16)-1
+
+Un signed short peut stocker 
+	un nombre de -32 768 a 32 767
+	un nombre de 2 pow(16-1) a 2 pow(16-1)-1
+
+4.2.2.14 - long
+
+un long est un nombre stocké sur au moins 32 bits
+il a donc au moins 2 pow(32)=4 294 967 296 valeurs possibles 
+Son nom signifie grand entier(long integer)
+
+Un unsigned long peut stocker 
+	un nombre de 0 a 4 294 967 296
+	un nombre de 0 a 2 pow(32)-1
+
+Un signed log peut stocker 
+	un nombre de -2 147 483 648 a 2 147 483 647
+	un nombre de 2 pow(32-1) a 2 pow(32-1)-1
+
+4.2.2.15 - long long 
+
+un long est un nombre stocké sur au moins 64 bits
+il a donc au moins 2 pow(64)=1.8*10 pow(19) valeurs possibles 
+Son nom signifie tres grand entier(long long integer)
+
+Un unsigned long long peut stocker 
+	un nombre de 0 a 18 446 744 073 709 551 615
+	un nombre de 0 a 2 pow(64)-1
+
+Un signed long long peut stocker 
+	un nombre de -9 233 372 036 854 775 808 a 9 233 372 036 854 775 807
+	un nombre de 2 pow(64-1) a 2 pow(64-1)-1
+
+4.2.2.16 - ATTENTION 
+
+il existe aussi le type int 
+Sa taille depend du processeur et du compilateur
+Ne pas l'utiliser dans un code portable 
+
+4.2.2.17 - Les entiers en c99
+
+En c99 est suivants, oublier tout ça
+
+#include <stdint.h>
+
+Des types non signée 
+
+	uint8_t,  8  bits exactements 
+	uint16_t, 16 bits exactements 
+	uint32_t, 32 bits exactements 
+	uint64_t, 64 bits exactements, si disponibles
+
+Des types signes
+
+	uint8_t,uint16_t,uint32_t,uint64_t
+
+4.2.2.18 - Les nombres a virgules fixes 
+
+comment stocker un nombre a virgules dans un nombre entier
+definir la valeurs de la plus peutite unitee 
+Exemple : 3 pox(-3)=1/8=0.125
+comme 2.5=20*0.125
+
+virgule fixe 
+
+unsigned char fixed point;
+fixed_point = 20;/* equuivalent a 2.5 = 20 * 0,125*/
+
+Attention a l'interpretation des valeurs des variables
+
+4.2.2.19 - TP: Virgule fixe
+4.2.2.19.2 - TP: Virgule fixe
+
+4.2.2.20 - Virgule flottante
+
+Si les plage des valeurs sonts trop grandes,
+probleme de stockage en virgule fixe 
+
+les nombre a virgules flottentes sont supportees
+
+	par les processeur avec FPA
+	par les processeur avec une implementation logicielle de FPU
+	inutilisable dans les autres cas 
+
+4.2.2.21 - IEEE 754
+
+nombre definissant le codage binaire des nombres a virgules flottante
+utiliser par les GPU et GPU ...
+
+simple precision: 32 bits 
+	1 bit de signe
+	8 bit d'exposant(-126 & 127)
+	23 bites de mantisse,plus 1 bit implicite
+
+Double precision: 64 bits
+	1 bit de signe
+	11 bit d'exposant(-126 & 127)
+	52 bites de mantisse,plus 1 bit implicite
+
+4.2.2.22 - IEEE 754 et le c
+
+le type 32 bit simple precision est de float
+le type 64 bit double precision est de double
+
+le float signifie genaralement 
+	(-1)pow(signe)*1,mantisse*2pow(exposant-127)
+
+le double signifie genaralement 
+	(-1)pow(signe)*1,mantisse*2pow(exposant-1023)
+
+4.2.2.23 IEEE 754 et le C
+
+Un float peut avoir une valeur de -3.4*10pox(38) à 3.4*10pow(38)
+
+Un double peut avoir une valeur de -1.7*10pow(308) à 1.7*10pow(308)
+
+
+La précision dépend de l'exposant
+
+Pour le plus grand exposant en simple précision, la précision est de 2*10pow(31)
+
+4.2.2.24 IEEE 754 et le C
+
+floating point
+	float age;
+	double big_number;
+
+	age - 20.5;
+	big number - 1234567890123456789012345678901234567890.0;
+
+
+4.2.2.25-IEEE 754: David Goldberg
+
+Nombre de bits fixé tous les nombres ne sont pas codable en binaire
+
+En C, 2.0 1.8 - 0.2 0.0
+
+Phénomènes d'absorption et de cancellation
+
+What Every Computer Scientist Should Know About Floating-Point Arithmetic, David Goldberg, 1991

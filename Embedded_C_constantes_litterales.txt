@@ -1,0 +1,132 @@
+4.2.2.26.1 - Constantes littérales
+
+Préfixes pour les entiers
+
+Préfixes
+
+	65 /* sans prefixe, valeur decimale 65 */
+
+	0123 /*valeur octale 123, soit 83 en decimal */
+
+	0x10 /* valeur hexadecimale 10, soit 15 en decimal
+
+	0X10 /*valeur hexadecimale 10, ost 15 en decimal */
+
+	Oxa /*valeur hexadecimale A, soit 10 en decimal */
+
+	OxA /* valeur hexadecimale A, soit 10 en decimal */
+
+	Oxa /* valeur hexadecimale A, soit 10 en decimal */
+
+	OXA /* valeur hexadecimale A, soit 10 en decimal */
+
+	OXaBcD /* valeur hexadecimale ABCD, pen importe la casse ici */
+
+
+
+
+4.2.2.26.2 Constantes littérales
+
+Suffixes pour les entiers
+
+Suffixes
+
+	50 /* sans suffice, int */
+
+	50u /* unsigned int /
+
+	50U /* unsigned int */
+
+	501 /* long */
+
+	50L /* long */
+
+	50ul /* unsigned long */
+
+	50UL /* unsigned long */
+
+	5001 / unsigned long */
+
+	50UL /* unsigned long */
+
+
+4.2.2.26.3 - Constantes littérales
+
+Pour les nombres à virgule flottante
+
+	Une partie entière (optionnelle, 0 si omise)
+
+	Un point (pour la virgule) et une partie décimale (le tout étant optionnel)
+
+	La lettre e (majuscule ou minuscule) et l'exposant entier (le tout étant optionnel)
+
+	Le suffixe f (majuscule ou minuscule) pour les float, et pas de suffixe pour les double
+
+
+4.2.2.26.4 - Constantes littérales
+
+float
+
+	50.0f /* 50,0 en float */
+
+	50E0f /* 50,0 = 50*10^0 en float */
+
+	13.7e12f /* 13,7*10^12 en float */
+
+
+	50.0 /* 50,0 en double */
+
+	50E0 /* 50,0 = 50 * 10^0 en double */
+
+	13.7e12 /* 13,7*10^12 en double */
+
+
+
+L'essentiel : Constantes littérales
+
+Préfixes: rien, 0, 0x ou OX Suffixe : rien, u ou U, I ou L, ul ou UL 78.437e8f
+
+
+
+4.2.2.27 void
+
+Il existe aussi le type void
+
+Nécessite plus de connaissances
+
+	pointeurs
+
+	fonctions
+
+
+
+
+L'essentiel : Les types de base
+
+unsigned nombre positif
+
+signed: nombre pouvant être négatif
+
+8 bits unsigned char: 0 à 255, signed char: -128 à 127
+
+ASCII pas étendu, character => char
+
+Pour stocker les nombres négatifs, le complément à deux est utilise
+
+16 bits unsigned short: 0 à 2pow(16) - 1, signed short: -2pow(16-1) à 2pow(16-1)-1
+
+32 bits: unsigned long:0 à 2pow(32) - 1, signed long:-2pow(32-1) à 2pow(32-1)-1
+
+64 bits unsigned long long 0 à 2pow(64)- 1. signed long long: -2pow(64-1) à 2pow(64-1)-1
+
+Ne pas utiliser int, sa taille est variable
+
+Depuis C99: #include <stdint.h> uint8_t, int8_t, uint16_t, int16_t. 32 et 64 
+
+Virgule fixe: nombre à virgule stocké dans un entier (avec une précision choisie et arbitraire)
+
+IEEE 754: norme des nombres à virgule flottante, simple précision 32 bits (float) et double précision 64 bits (double)
+
+IEEE 754 = précision pas infinie
+
+§Constantes littérales
